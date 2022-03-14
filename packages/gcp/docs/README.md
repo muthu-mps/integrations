@@ -1,6 +1,8 @@
 # Google Cloud Integration
 
-The Google Cloud integration collects and parses Google [Cloud Audit Logs](https://cloud.google.com/logging/docs/audit), [VPC Flow Logs](https://cloud.google.com/vpc/docs/using-flow-logs), [Firewall Rules Logs](https://cloud.google.com/vpc/docs/firewall-rules-logging) and [Cloud DNS](https://cloud.google.com/dns) logs that have been exported from Stackdriver to a Google Pub/Sub topic sink.
+## Overview
+
+The Google Cloud integration collects and parses Google Cloud [Audit Logs](https://cloud.google.com/logging/docs/audit), [VPC Flow Logs](https://cloud.google.com/vpc/docs/using-flow-logs), [Firewall Rules Logs](https://cloud.google.com/vpc/docs/firewall-rules-logging) and [Cloud DNS](https://cloud.google.com/dns) logs that have been exported from Stackdriver to a Google Pub/Sub topic sink.
 
 
 ## Authentication
@@ -15,7 +17,7 @@ The Service Account will be used by the Elastic Agent access data from the Googl
 
 ### Roles
 
-You need to grant your Service Account access to GCP resources adding one or more roles.
+You need to grant your Service Account (SA) access to GCP resources adding one or more roles.
 
 For this integration to work, you need need to add the following roles to your Service Account:
 
@@ -24,33 +26,37 @@ For this integration to work, you need need to add the following roles to your S
 - Pub/Sub Viewer
 - Pub/Sub Subscriber
 
-If you haven's already, this might be a good time to check out the [best practices for securing service accounts](https://cloud.google.com/iam/docs/best-practices-for-securing-service-accounts).
+Always follow the [priciple of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege) when adding a new eolo to your SA. If you haven't already, this might be a good time to check out the [best practices for securing service accounts](https://cloud.google.com/iam/docs/best-practices-for-securing-service-accounts) guide.
 
 ### Service Account Keys
 
-Now, with your brand new Service Account with access to GCP resources, you need some credentials to assiciate with it: a Service Account Key.
+Now, with your brand new Service Account (SA) with access to GCP resources, you need some credentials to assiciate with it: a Service Account Key.
 
-Open your Service Account, create a new key, download and store the generated private key securely. The private key can't be recovered from GCP, if lost.
+From the list of SA:
 
-When adding an additional role, please always follow the [priciple of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege), and take some time to review the GCP's [best practices for managing service account keys](https://cloud.google.com/iam/docs/best-practices-for-managing-service-account-keys).
+1. Click the one you just created to open the detailed view.
+2. From the Keys section, click Add key > Create new Key and select JSON as the type.
+3. Download and store the generated private key securely (and remember, the private key can't be recovered from GCP, if lost).
+
+Optional: ake some time to review the GCP's [best practices for managing service account keys](https://cloud.google.com/iam/docs/best-practices-for-managing-service-account-keys).
 
 ## Configure the Integration Settings
 
-The Integration Settings require you to enter a few values that will be used for all services (audit, DNS, firewall and vpcflows logs).
-
 The Project Id and either the Credentials File or Credentials Json will need to be provided in the integration UI when adding the Google Cloud Platform (GCP) integration.
+
+The settings values that will be used for all logs from the supported services (Audit, DNS, Firewall and VPC Flows).
 
 ### Project Id
 
-This is the ID of your GCP project where the resources exist.
+This is the ID of your Google Cloud project where the resources exist.
 
 ### Credentials File vs Json
 
-Specify the information in either the Credentials File OR Credentials Json field based on your preference.
+Specify the information in either the Credentials File OR Credentials Json field, based on your preference.
 
 #### Option 1: Credentials File
 
-Save the JSON file with the private key in a secure location, and make sure that Elastic agent has at least read-only privileges to this file.
+Save the JSON file with the private key in a secure location of the file system, and make sure that Elastic agent has at least read-only privileges to this file.
 
 Specify the file path in the Credentials File field in the Elastic Agent GCP integration UI.
 
@@ -63,3 +69,26 @@ Specify the JSON content you downloaded from Google Cloud Platform directly in t
 #### Recommendations
 
 Elastic recommends using Credentials File as in this method, so the credential information doesn’t leave your Google Cloud Platform environment. When using Credentials Json the information is stored in Elasticsearch, and the access is controlled based on policy permissions or access to underlying Elasticsearch data.
+
+## Logs Collection Configuration
+
+You need to create a few dedicated Google Cloud resources before start collecting logs.
+
+You need one or more of the following:
+
+- Log Sink
+- Pub/Sub Topic
+- Subscription
+
+Elastic recommends separate Pub/Sub topics for each of the log types, so that they can be parsed and stored in a specific data stream.
+
+Here’s an example on how to collect Audit Logs with a Pub/Sub topic and a subscription using Log Router in the Google cloud console.
+
+At a high level the steps required are:
+
+- Visit "Logging" > "Log Router" > "Create Sink" and provide a sink name and description.
+- In "Sink destination", select "Cloud Pub/Sub topic" as the sink service. Select an existing topic or Create a topic. Note the topic name, as it will be provided in the Topic field in the Elastic agent configuration.
+- If you created a new topic, then you must remember to go to that topic and create a subscription for it. A subscription directs messages on a topic to subscribers. Note the "Subscription ID", as it will need to be entered in the "Subscription name" field in the Elastic Agent configuration.
+- Under "Choose logs to include in sink", for example add `logName:"cloudaudit.googleapis.com"` in the "Inclusion filter" to include all audit logs.
+
+This is just an example, you will need to create your own filter expression to select the log types you want to export to the Pub/Sub topic.
