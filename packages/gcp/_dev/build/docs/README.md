@@ -65,7 +65,7 @@ Specify the JSON content you downloaded from Google Cloud Platform directly in t
 
 #### Recommendations
 
-Elastic recommends using Credentials File as in this method, so the credential information doesn’t leave your Google Cloud Platform environment. When using Credentials Json the information is stored in Elasticsearch, and the access is controlled based on policy permissions or access to underlying Elasticsearch data.
+Elastic recommends using Credentials File as this method, so the credential information doesn’t leave your Google Cloud Platform environment. When using Credentials Json, the integration stores the info in Elasticsearch, and the access is controlled based on policy permissions or access to underlying Elasticsearch data.
 
 ## Logs Collection Configuration
 
@@ -94,7 +94,7 @@ This is just an example, you will need to create your own filter expression to s
 
 ### Audit
 
-This is the `audit` dataset.
+The `audit` dataset collects audit logs of administrative activities and accesses within your Google Cloud resources.
 
 {{fields "audit"}}
 
@@ -102,7 +102,7 @@ This is the `audit` dataset.
 
 ### Firewall
 
-This is the `firewall` dataset.
+The `firewall` dataset collects logs from Firewall Rules in your Virtual Private Cloud (VPC) networks.
 
 {{fields "firewall"}}
 
@@ -110,7 +110,7 @@ This is the `firewall` dataset.
 
 ### VPC Flow
 
-This is the `VPC Flow` dataset.
+he `vpcflow` dataset collects logs sent from and received by VM instances, including instances used as GKE nodes.
 
 {{fields "vpcflow"}}
 
@@ -118,7 +118,7 @@ This is the `VPC Flow` dataset.
 
 ### DNS
 
-This is the `DNS` dataset.
+The `dns` dataset collects queries that name servers resolve for your Virtual Private Cloud (VPC) networks, as well as queries from an external entity directly to a public zone.
 
 {{fields "dns"}}
 
