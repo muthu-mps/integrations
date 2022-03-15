@@ -1,8 +1,8 @@
-# Firewall
+# VPC Flow
 
 ## Logs
 
-The `firewall` dataset collects logs from Firewall Rules in your Virtual Private Cloud (VPC) networks.
+The `vpcflow` dataset collects logs sent from and received by VM instances, including instances used as GKE nodes.
 
 **Exported fields**
 
@@ -52,23 +52,14 @@ The `firewall` dataset collects logs from Firewall Rules in your Virtual Private
 | gcp.destination.vpc.project_id | ID of the project containing the VM. | keyword |
 | gcp.destination.vpc.subnetwork_name | Subnetwork on which the VM is operating. | keyword |
 | gcp.destination.vpc.vpc_name | VPC on which the VM is operating. | keyword |
-| gcp.firewall.rule_details.action | Action that the rule performs on match. | keyword |
-| gcp.firewall.rule_details.destination_range | List of destination ranges that the firewall applies to. | keyword |
-| gcp.firewall.rule_details.direction | Direction of traffic that matches this rule. | keyword |
-| gcp.firewall.rule_details.ip_port_info | List of ip protocols and applicable port ranges for rules. | array |
-| gcp.firewall.rule_details.priority | The priority for the firewall rule. | long |
-| gcp.firewall.rule_details.reference | Reference to the firewall rule. | keyword |
-| gcp.firewall.rule_details.source_range | List of source ranges that the firewall rule applies to. | keyword |
-| gcp.firewall.rule_details.source_service_account | List of all the source service accounts that the firewall rule applies to. | keyword |
-| gcp.firewall.rule_details.source_tag | List of all the source tags that the firewall rule applies to. | keyword |
-| gcp.firewall.rule_details.target_service_account | List of all the target service accounts that the firewall rule applies to. | keyword |
-| gcp.firewall.rule_details.target_tag | List of all the target tags that the firewall rule applies to. | keyword |
 | gcp.source.instance.project_id | ID of the project containing the VM. | keyword |
 | gcp.source.instance.region | Region of the VM. | keyword |
 | gcp.source.instance.zone | Zone of the VM. | keyword |
 | gcp.source.vpc.project_id | ID of the project containing the VM. | keyword |
 | gcp.source.vpc.subnetwork_name | Subnetwork on which the VM is operating. | keyword |
 | gcp.source.vpc.vpc_name | VPC on which the VM is operating. | keyword |
+| gcp.vpcflow.reporter | The side which reported the flow. Can be either 'SRC' or 'DEST'. | keyword |
+| gcp.vpcflow.rtt.ms | Latency as measured (for TCP flows only) during the time interval. This is the time elapsed between sending a SEQ and receiving a corresponding ACK and it contains the network RTT as well as the application related delay. | long |
 | host.architecture | Operating system architecture. | keyword |
 | host.containerized | If the host is a container. | boolean |
 | host.domain | Name of the domain of which the host is a member. For example, on Windows this could be the host's Active Directory domain or NetBIOS domain name. For Linux this could be the domain of the host's LDAP provider. | keyword |
@@ -90,10 +81,12 @@ The `firewall` dataset collects logs from Firewall Rules in your Virtual Private
 | log.logger | The name of the logger inside an application. This is usually the name of the class which initialized the logger, or can be a custom name. | keyword |
 | log.offset | Log offset | long |
 | message | For log events the message field contains the log message, optimized for viewing in a log viewer. For structured logs without an original message field, other fields can be concatenated to form a human-readable summary of the event. If multiple messages exist, they can be combined into one message. | match_only_text |
+| network.bytes | Total bytes transferred in both directions. If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum. | long |
 | network.community_id | A hash of source and destination IPs and ports, as well as the protocol used in a communication. This is a tool-agnostic standard to identify flows. Learn more at https://github.com/corelight/community-id-spec. | keyword |
 | network.direction | Direction of the network traffic. Recommended values are:   \* ingress   \* egress   \* inbound   \* outbound   \* internal   \* external   \* unknown  When mapping events from a host-based monitoring context, populate this field from the host's point of view, using the values "ingress" or "egress". When mapping events from a network or perimeter-based monitoring context, populate this field from the point of view of the network perimeter, using the values "inbound", "outbound", "internal" or "external". Note that "internal" is not crossing perimeter boundaries, and is meant to describe communication between two hosts within the perimeter. Note also that "external" is meant to describe traffic between two hosts that are external to the perimeter. This could for example be useful for ISPs or VPN service providers. | keyword |
 | network.iana_number | IANA Protocol Number (https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml). Standardized list of protocols. This aligns well with NetFlow and sFlow related logs which use the IANA Protocol Number. | keyword |
 | network.name | Name given by operators to sections of their network. | keyword |
+| network.packets | Total packets transferred in both directions. If `source.packets` and `destination.packets` are known, `network.packets` is their sum. | long |
 | network.transport | Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.) The field value must be normalized to lowercase for querying. | keyword |
 | network.type | In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc The field value must be normalized to lowercase for querying. | keyword |
 | related.hash | All the hashes seen on your event. Populating this field, then using it to search for hashes can help in situations where you're unsure what the hash algorithm is (and therefore which key name to search). | keyword |
@@ -104,6 +97,7 @@ The `firewall` dataset collects logs from Firewall Rules in your Virtual Private
 | source.address | Some event source addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field. Then it should be duplicated to `.ip` or `.domain`, depending on which one it is. | keyword |
 | source.as.number | Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet. | long |
 | source.as.organization.name | Organization name. | keyword |
+| source.bytes | Bytes sent from the source to the destination. | long |
 | source.domain | The domain name of the source system. This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment. | keyword |
 | source.geo.city_name | City name. | keyword |
 | source.geo.continent_name | Name of the continent. | keyword |
@@ -114,39 +108,44 @@ The `firewall` dataset collects logs from Firewall Rules in your Virtual Private
 | source.geo.region_iso_code | Region ISO code. | keyword |
 | source.geo.region_name | Region name. | keyword |
 | source.ip | IP address of the source (IPv4 or IPv6). | ip |
+| source.packets | Packets sent from the source to the destination. | long |
 | source.port | Port of the source. | long |
 | tags | List of keywords used to tag each event. | keyword |
 
 
-An example event for `firewall` looks as following:
+An example event for `vpcflow` looks as following:
 
 ```json
 {
-    "@timestamp": "2019-10-30T13:52:42.191Z",
+    "@timestamp": "2019-06-14T03:50:10.845Z",
     "agent": {
-        "ephemeral_id": "4fed48b9-0848-4ceb-88b1-30fb7da99604",
+        "ephemeral_id": "e58d02a0-e7a0-45c0-aba6-a8c983782744",
         "id": "c53ddea2-61ac-4643-8676-0c70ebf51c91",
         "name": "docker-fleet-agent",
         "type": "filebeat",
         "version": "8.0.0-beta1"
     },
-    "cloud": {
-        "availability_zone": "us-east1-b",
-        "project": {
-            "id": "test-beats"
-        },
-        "region": "us-east1"
-    },
     "data_stream": {
-        "dataset": "gcp.firewall",
+        "dataset": "gcp.vpcflow",
         "namespace": "ep",
         "type": "logs"
     },
     "destination": {
-        "address": "10.42.0.2",
-        "domain": "test-windows",
-        "ip": "10.42.0.2",
-        "port": 3389
+        "address": "67.43.156.13",
+        "as": {
+            "number": 35908
+        },
+        "geo": {
+            "continent_name": "Asia",
+            "country_iso_code": "BT",
+            "country_name": "Bhutan",
+            "location": {
+                "lat": 27.5,
+                "lon": 90.5
+            }
+        },
+        "ip": "67.43.156.13",
+        "port": 33478
     },
     "ecs": {
         "version": "8.0.0"
@@ -157,48 +156,34 @@ An example event for `firewall` looks as following:
         "version": "8.0.0-beta1"
     },
     "event": {
-        "action": "firewall-rule",
         "agent_id_status": "verified",
         "category": "network",
-        "created": "2021-12-31T03:11:30.136Z",
-        "dataset": "gcp.firewall",
-        "id": "1f21ciqfpfssuo",
-        "ingested": "2021-12-31T03:11:31Z",
+        "created": "2021-12-31T03:12:25.823Z",
+        "dataset": "gcp.vpcflow",
+        "end": "2019-06-14T03:45:37.301953198Z",
+        "id": "ut8lbrffooxyw",
+        "ingested": "2021-12-31T03:12:26Z",
         "kind": "event",
+        "start": "2019-06-14T03:45:37.186193305Z",
         "type": "connection"
     },
     "gcp": {
-        "destination": {
+        "source": {
             "instance": {
-                "project_id": "test-beats",
+                "project_id": "my-sample-project",
                 "region": "us-east1",
                 "zone": "us-east1-b"
             },
             "vpc": {
-                "project_id": "test-beats",
-                "subnetwork_name": "windows-isolated",
-                "vpc_name": "windows-isolated"
+                "project_id": "my-sample-project",
+                "subnetwork_name": "default",
+                "vpc_name": "default"
             }
         },
-        "firewall": {
-            "rule_details": {
-                "action": "ALLOW",
-                "direction": "INGRESS",
-                "ip_port_info": [
-                    {
-                        "ip_protocol": "TCP",
-                        "port_range": [
-                            "3389"
-                        ]
-                    }
-                ],
-                "priority": 1000,
-                "source_range": [
-                    "0.0.0.0/0"
-                ],
-                "target_tag": [
-                    "allow-rdp"
-                ]
+        "vpcflow": {
+            "reporter": "SRC",
+            "rtt": {
+                "ms": 36
             }
         }
     },
@@ -206,37 +191,34 @@ An example event for `firewall` looks as following:
         "type": "gcp-pubsub"
     },
     "log": {
-        "logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall"
+        "logger": "projects/my-sample-project/logs/compute.googleapis.com%2Fvpc_flows"
     },
     "network": {
-        "community_id": "1:OdLB9eXsBDLz8m97ao4LepX6q+4=",
-        "direction": "inbound",
+        "bytes": 1776,
+        "community_id": "1:Wa+aonxAQZ59AWtNdQD0CH6FnsM=",
+        "direction": "outbound",
         "iana_number": "6",
-        "name": "windows-isolated",
+        "packets": 7,
         "transport": "tcp",
         "type": "ipv4"
     },
     "related": {
         "ip": [
-            "192.168.2.126",
-            "10.42.0.2"
+            "10.87.40.76",
+            "67.43.156.13"
         ]
     },
-    "rule": {
-        "name": "network:windows-isolated/firewall:windows-isolated-allow-rdp"
-    },
     "source": {
-        "address": "192.168.2.126",
-        "geo": {
-            "continent_name": "Asia",
-            "country_name": "omn"
-        },
-        "ip": "192.168.2.126",
-        "port": 64853
+        "address": "10.87.40.76",
+        "bytes": 1776,
+        "domain": "kibana",
+        "ip": "10.87.40.76",
+        "packets": 7,
+        "port": 5601
     },
     "tags": [
         "forwarded",
-        "gcp-firewall"
+        "gcp-vpcflow"
     ]
 }
 ```
