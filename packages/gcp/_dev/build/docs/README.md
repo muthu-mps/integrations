@@ -18,7 +18,7 @@ The Elastic Agent uses the Service Account to access data on GCP from the Google
 
 You need to grant your Service Account (SA) access to GCP resources adding one or more roles.
 
-For this integration to work, you need to add the following roles to your Service Account:
+For this integration to work, you need to add the following roles to your SA:
 
 - `Compute Viewer`
 - `Monitoring Viewer`
@@ -41,23 +41,23 @@ Optional: take some time to review the GCP's [best practices for managing servic
 
 ## Configure the Integration Settings
 
-The Project Id and either the Credentials File or Credentials Json will need to be provided in the integration UI when adding the Google Cloud Platform (GCP) integration.
+The next step is to configure the general integration settings used for all logs from the supported services (Audit, DNS, Firewall, and VPC Flow).
 
-The settings values that will be used for all logs from the supported services (Audit, DNS, Firewall and VPC Flows).
+The "Project Id" and either the "Credentials File" or "Credentials Json" will need to be provided in the integration UI when adding the Google Cloud Platform (GCP) integration.
 
 ### Project Id
 
-This is the ID of your Google Cloud project where the resources exist.
+The Project Id is your Google Cloud project ID where the resources exist.
 
 ### Credentials File vs Json
 
-Specify the information in either the Credentials File OR Credentials Json field, based on your preference.
+Based on your preference, specify the information in either the Credentials File OR the Credentials Json field.
 
 #### Option 1: Credentials File
 
-Save the JSON file with the private key in a secure location of the file system, and make sure that Elastic agent has at least read-only privileges to this file.
+Save the JSON file with the private key in a secure location of the file system, and make sure that the Elastic Agent has at least read-only privileges to this file.
 
-Specify the file path in the Credentials File field in the Elastic Agent GCP integration UI. For example: `/home/ubuntu/credentials.json`.
+Specify the file path in the Elastic Agent GCP integration UI in the Credentials File field. For example: `/home/ubuntu/credentials.json`.
 
 #### Option 2: Credentials Json
 
@@ -69,26 +69,69 @@ Elastic recommends using Credentials File as this method, so the credential info
 
 ## Logs Collection Configuration
 
-You need to create a few dedicated Google Cloud resources before start collecting logs.
+With a propertly configure Service Account and the integration setting in place, it's time to start collecting some logs.
 
-You need one or more of the following:
+### Requirements
+
+You need to create a few dedicated Google Cloud resources before starting, in detail:
 
 - Log Sink
 - Pub/Sub Topic
 - Subscription
 
-Elastic recommends separate Pub/Sub topics for each of the log types, so that they can be parsed and stored in a specific data stream.
+Elastic recommends separate Pub/Sub topics for each of the log types so that they can be parsed and stored in a specific data stream.
 
-Here’s an example on how to collect Audit Logs with a Pub/Sub topic and a subscription using Log Router in the Google cloud console.
+Here's an example of collecting Audit Logs with a Pub/Sub topic and a subscription using Log Router in the Google cloud console and the Elastic CGP Integration.
 
-At a high level the steps required are:
+### On the Google Cloud Console
+
+At a high level, the steps required are:
 
 - Visit "Logging" > "Log Router" > "Create Sink" and provide a sink name and description.
-- In "Sink destination", select "Cloud Pub/Sub topic" as the sink service. Select an existing topic or Create a topic. Note the topic name, as it will be provided in the Topic field in the Elastic agent configuration.
-- If you created a new topic, then you must remember to go to that topic and create a subscription for it. A subscription directs messages on a topic to subscribers. Note the "Subscription ID", as it will need to be entered in the "Subscription name" field in the Elastic Agent configuration.
+- In "Sink destination", select "Cloud Pub/Sub topic" as the sink service. Select an existing topic or "Create a topic". Note the topic name, as it will be provided in the Topic field in the Elastic agent configuration.
+- If you created a new topic, you must remember to go to that topic and create a subscription for it. A subscription directs messages on a topic to subscribers. Note the "Subscription ID", as it will need to be entered in the "Subscription name" field in the Elastic Agent configuration.
 - Under "Choose logs to include in sink", for example add `logName:"cloudaudit.googleapis.com"` in the "Inclusion filter" to include all audit logs.
 
-This is just an example, you will need to create your own filter expression to select the log types you want to export to the Pub/Sub topic.
+This is just an example; you will need to create your filter expression to select the log types you want to export to the Pub/Sub topic.
+
+### On the Google Cloud Integration Settings
+
+Visit the Google Cloud Integration page on your cluster, and then select the Integration Policies tab. Select the integration policy you previously created.
+
+From the list of services, select "Google Cloud Platform (GCP) audit logs (gcp-pubsub)" and:
+
+- On the "Topic field", specify the "topic name" you noted before on the Google Cloud Console.
+- On the "Subscription Name", specify the "Subscription ID" you noted before on the Google Cloud Console.
+- Click on "Save Integration", and make sure the Elastic Agent is updated with the revision of the policy.
+
+### Troubleshooting
+
+If you don't see Audit logs showing up, check the Agent logs to see if there are errors.
+
+Common error types:
+
+- Missing roles in the Service Account
+- Misconfigured settings, like "Project Id", "Topic field" or "Subscription Name"
+
+#### Missing Roles in the Service Account
+
+If your Service Account (SA) does not have the required roles, you might find errors like this one in the `elastic_agent.filebeat` dataset:
+
+```text
+failed to subscribe to pub/sub topic: failed to check if subscription exists: rpc error: code = PermissionDenied desc = User not authorized to perform this action.
+```
+
+Solution: make sure your SA has all the required roles.
+
+#### Misconfigured Settings
+
+If you specify the wrong "Topic field" or "Subscription Name", you might find errors like this one in the `elastic_agent.filebeat` dataset:
+
+```text
+[elastic_agent.filebeat][error] failed to subscribe to pub/sub topic: failed to check if subscription exists: rpc error: code = InvalidArgument desc = Invalid resource name given (name=projects/project/subscriptions/projects/project/subscriptions/non-existent-sub). Refer to https://cloud.google.com/pubsub/docs/admin#resource_names for more information.
+```
+
+Solution: double check the integration settings.
 
 ## Logs
 
