@@ -2,42 +2,42 @@
 
 ## Overview
 
-The Google Cloud integration collects and parses Google Cloud [Audit Logs](https://cloud.google.com/logging/docs/audit), [VPC Flow Logs](https://cloud.google.com/vpc/docs/using-flow-logs), [Firewall Rules Logs](https://cloud.google.com/vpc/docs/firewall-rules-logging) and [Cloud DNS](https://cloud.google.com/dns) logs that have been exported from Stackdriver to a Google Pub/Sub topic sink.
+The Google Cloud integration collects and parses Google Cloud [Audit Logs](https://cloud.google.com/logging/docs/audit), [VPC Flow Logs](https://cloud.google.com/vpc/docs/using-flow-logs), [Firewall Rules Logs](https://cloud.google.com/vpc/docs/firewall-rules-logging) and [Cloud DNS Logs](https://cloud.google.com/dns/docs/monitoring) that have been exported from Stackdriver to a Google Pub/Sub topic sink.
 
 ## Authentication
 
-To use this Google Cloud Platform (GCP) integration, you need to set up a *Service Account* with a few *Roles*, and a *Service Account Key* to access data on your GCP project.
+To use this Google Cloud Platform (GCP) integration, you need to set up a *Service Account* with a few *Roles*and a *Service Account Key* to access data on your GCP project.
 
 ### Service Account
 
-First, you need to [create a Service Account](https://cloud.google.com/iam/docs/creating-managing-service-accounts). A Service Account is special type of Google account intended to represent a non-human user that needs to access resources on the GCP.
+First, you need to [create a Service Account](https://cloud.google.com/iam/docs/creating-managing-service-accounts). A Service Account is a particular type of Google account intended to represent a non-human user who needs to access the GCP resources.
 
-The Service Account will be used by the Elastic Agent access data from the Google APIs.
+The Elastic Agent uses the Service Account to access data on GCP from the Google APIs.
 
 ### Roles
 
 You need to grant your Service Account (SA) access to GCP resources adding one or more roles.
 
-For this integration to work, you need need to add the following roles to your Service Account:
+For this integration to work, you need to add the following roles to your Service Account:
 
 - `Compute Viewer`
 - `Monitoring Viewer`
 - `Pub/Sub Viewer`
 - `Pub/Sub Subscriber`
 
-Always follow the "priciple of least privilege" when adding a new role to your SA. If you haven't already, this might be a good time to check out the [best practices for securing service accounts](https://cloud.google.com/iam/docs/best-practices-for-securing-service-accounts) guide.
+Always follow the "principle of least privilege" when adding a new role to your SA. If you haven't already, this might be a good moment to check out the [best practices for securing service accounts](https://cloud.google.com/iam/docs/best-practices-for-securing-service-accounts) guide.
 
 ### Service Account Keys
 
-Now, with your brand new Service Account (SA) with access to GCP resources, you need some credentials to assiciate with it: a Service Account Key.
+Now, with your brand new Service Account (SA) with access to GCP resources, you need some credentials to associate with it: a Service Account Key.
 
 From the list of SA:
 
 1. Click the one you just created to open the detailed view.
-2. From the Keys section, click Add key > Create new Key and select JSON as the type.
-3. Download and store the generated private key securely (and remember, the private key can't be recovered from GCP, if lost).
+2. From the Keys section, click "Add key" > "Create new key" and select JSON as the type.
+3. Download and store the generated private key securely (remember, the private key can't be recovered from GCP if lost).
 
-Optional: ake some time to review the GCP's [best practices for managing service account keys](https://cloud.google.com/iam/docs/best-practices-for-managing-service-account-keys).
+Optional: take some time to review the GCP's [best practices for managing service account keys](https://cloud.google.com/iam/docs/best-practices-for-managing-service-account-keys).
 
 ## Configure the Integration Settings
 
