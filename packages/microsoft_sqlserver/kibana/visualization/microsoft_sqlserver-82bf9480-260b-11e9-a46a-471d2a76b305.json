@@ -18,9 +18,9 @@
             "params": {
                 "controls": [
                     {
-                        "fieldName": "mssql.database.name",
+                        "fieldName": "sql.metrics.database_name",
                         "id": "1549016598264",
-                        "indexPattern": "metrics-*",
+                        "indexPatternRefName": "control_0_index_pattern",
                         "label": "",
                         "options": {
                             "dynamicOptions": true,
@@ -41,11 +41,17 @@
             "type": "input_control_vis"
         }
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "8.3.0",
     "id": "microsoft_sqlserver-82bf9480-260b-11e9-a46a-471d2a76b305",
     "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "8.3.0"
     },
-    "references": [],
+    "references": [
+        {
+            "id": "metrics-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
     "type": "visualization"
 }
