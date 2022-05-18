@@ -1,8 +1,16 @@
-metricsets: ["transaction_log"]
+metricsets: ["query"]
 hosts:
-{{#each hosts}}
-  - {{this}}
-{{/each}}
-password: {{password}}
+  - {{named_instance}}://{{username}}:{{password}}@{{hosts}}
 period: {{period}}
-username: {{username}}
+
+driver: mssql
+raw_data.enabled: true
+sql_queries:
+    - query: "SELECT name, database_id FROM sys.databases WHERE database_id=1;"
+      response_format: table
+
+    - query: "SELECT database_id,total_log_size_mb,active_log_size_mb,log_backup_time,log_since_last_log_backup_mb,log_since_last_checkpoint_mb,log_recovery_size_mb FROM sys.dm_db_log_stats(1) master"
+      response_format: table
+
+    - query: "SELECT * FROM sys.dm_db_log_space_usage master"
+      response_format: table
