@@ -53,13 +53,13 @@ policy_templates:
             required: true
             show_user: true
             default: domain\username
-          - name: named_instance
-            type: text
-            title: NamedInstance
+          - name: port
+            type: integer
+            title: Instance Port
             multi: false
             required: true
             show_user: true
-            default: sqlserver
+            default: 1433
         title: Collect MSSQL performance and transaction_log metrics
         description: Collecting performance and transaction_log metrics from MSSQL instances
 owner:

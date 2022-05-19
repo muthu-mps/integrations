@@ -1,6 +1,6 @@
 metricsets: ["query"]
 hosts:
-  - {{named_instance}}://{{username}}:{{password}}@{{hosts}}
+    - sqlserver://{{username}}:{{password}}@{{hosts}}:{{port}}
 period: {{period}}
 
 driver: mssql
