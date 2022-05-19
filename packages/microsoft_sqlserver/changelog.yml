@@ -1,5 +1,5 @@
 # newer versions go on top
-- version: "0.5.2"
+- version: "0.5.3"
   changes:
     - description: Trial MSSQL Metrics.
       type: enhancement
