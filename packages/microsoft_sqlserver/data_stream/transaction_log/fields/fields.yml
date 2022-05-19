@@ -1,6 +1,6 @@
 - name: sql
   type: group
-  release: ga
+  release: experimental
   fields:
     - name: driver
       type: keyword
@@ -34,8 +34,7 @@
       description: Log file size since last backup
     - name: metrics.used_log_space_in_percent
       type: float
-      description: A percentage of the occupied size of the log as a percent of
-        the total log size
+      description: A percentage of the occupied size of the log as a percent of the total log size
     - name: metrics.used_log_space_in_bytes
       type: long
       description: The occupied size of the log in bytes
