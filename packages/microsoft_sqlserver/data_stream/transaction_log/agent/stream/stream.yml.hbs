@@ -5,6 +5,7 @@ period: {{period}}
 
 driver: mssql
 raw_data.enabled: true
+# Collect the transaction logs from the system database
 sql_queries:
     - query: "SELECT name As 'database_name', database_id FROM sys.databases WHERE database_id=1;"
       response_format: table
