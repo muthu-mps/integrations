@@ -21,7 +21,7 @@
                         "fieldName": "sql.metrics.database_name",
                         "id": "1549016598264",
                         "indexPatternRefName": "control_0_index_pattern",
-                        "label": "",
+                        "label": "Database Name",
                         "options": {
                             "dynamicOptions": true,
                             "multiselect": true,
