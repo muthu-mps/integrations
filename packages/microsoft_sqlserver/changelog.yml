@@ -1,7 +1,7 @@
 # newer versions go on top
 - version: "0.5.2"
   changes:
-    - description: Added performance datastream
+    - description: Added transaction datastream
       type: enhancement
       link: https://github.com/elastic/integrations/pull/2780
 - version: "0.5.1"
